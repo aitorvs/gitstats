@@ -709,7 +709,11 @@ class GitDataCollector(DataCollector):
 
 	def getTotalSize(self):
 		return self.total_size
-	
+
+	def getTotalCommitsPerWeek(self):
+		weeks = self.getCommitDeltaDays() / 7
+		return self.total_commits / weeks
+
 	def revToDate(self, rev):
 		stamp = int(getpipeoutput(['git log --pretty=format:%%at "%s" -n 1' % rev]))
 		return datetime.datetime.fromtimestamp(stamp).strftime('%Y-%m-%d')
@@ -764,7 +768,7 @@ class HTMLReportCreator(ReportCreator):
 		f.write('<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>' % (data.getCommitDeltaDays(), len(data.getActiveDays()), (100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays())))
 		f.write('<dt>Total Files</dt><dd>%s</dd>' % data.getTotalFiles())
 		f.write('<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>' % (data.getTotalLOC(), data.total_lines_added, data.total_lines_removed))
-		f.write('<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>' % (data.getTotalCommits(), float(data.getTotalCommits()) / len(data.getActiveDays()), float(data.getTotalCommits()) / data.getCommitDeltaDays()))
+		f.write('<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days, %s per week)</dd>' % (data.getTotalCommits(), float(data.getTotalCommits()) / len(data.getActiveDays()), float(data.getTotalCommits()) / data.getCommitDeltaDays(), data.getTotalCommitsPerWeek()))
 		f.write('<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>' % (data.getTotalAuthors(), (1.0 * data.getTotalCommits()) / data.getTotalAuthors()))
 		f.write('</dl>')
 
